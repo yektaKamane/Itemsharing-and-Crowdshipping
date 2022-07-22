@@ -4,20 +4,9 @@
 #include <cstring> 
 #include <sstream>
 #include <algorithm>
+#include "genetic.h"
 
 using namespace std;
-
-class Node {
-  public:
-    double x;
-    double y;
-};
-
-class Trip {
-  public:
-    Node src;
-    Node dest;
-};
 
 void read_data_node(int index, int ctrl, int data_size, Node *ptr){
     int coordinates_size = 2;
@@ -107,7 +96,7 @@ int main(){
             // read crowdshippers
             read_data_trip(i+1, part, trips);
 
-            
+            genetic_algorithm(supplies, requests, trips, part);
         }
     }
 
