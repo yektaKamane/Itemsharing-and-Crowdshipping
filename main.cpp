@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstring> 
 #include <sstream>
+#include <time.h>
 #include <algorithm>
 #include "genetic.h"
 
@@ -81,6 +82,7 @@ void read_data_trip(int index, int data_size, Trip *ptr){
 int main(){
 
     std::cout << "begin" << std::endl;
+    srand(time(0));
     int num_of_sets = 10;
     int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
 
