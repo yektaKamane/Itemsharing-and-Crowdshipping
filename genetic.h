@@ -12,4 +12,4 @@ class Trip {
 };
 
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size);
-void create_initial_population(int population_size, int ***population);
+void create_initial_population(int population_size, int data_size, int ***population);
