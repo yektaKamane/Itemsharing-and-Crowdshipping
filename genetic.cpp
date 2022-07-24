@@ -89,13 +89,13 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
         for (int j=0; j<data_size; j++){
             // get the delivery type 
             int delivery_type = population[i][2][j];
-            // get the coordinates of supplier
+            // get the coordinates of the supplier
             double s_x = supply[j].x;
             double s_y = supply[j].y;
-            // get the coordinates of request
+            // get the coordinates of the request
             double r_x = req[population[i][0][j]].x;
             double r_y = req[population[i][0][j]].y;
-
+            // get the coordinates of the trip
             double ts_x = trip[population[i][1][j]].src.x;
             double ts_y = trip[population[i][1][j]].src.y;
             double td_x = trip[population[i][1][j]].dest.x;
