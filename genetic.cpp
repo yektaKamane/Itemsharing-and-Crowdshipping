@@ -17,7 +17,7 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
     // print_population(20, 10, population);
 
     for(int iteration=0; iteration<iteration_number; iteration++){
-
+        
         // fitness calculation
         calculate_fitness(fitness, population, population_size, data_size, supplies, requests, trips);
         // print_fitness(fitness, population_size);
@@ -25,8 +25,11 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         // selection
         // print fitness values to see which selection fits better
         // try out different selection methods
+        int *selection_pool = (int *)malloc(population_size);
+
 
         // crossover
+        // try out different crossover methods
 
         // mutation
     }
@@ -149,6 +152,22 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
         }
         fitness[i] = sum;
     }
+}
+
+int rank_select(int *selection_pool, int *fitness){
+    int pool_size = 0;
+
+    // fill out later
+
+    return pool_size;
+}
+
+int roulette_wheel_select(int *selection_pool, int *fitness){
+    int pool_size = 0;
+
+    // fill out later
+
+    return pool_size;
 }
 
 double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude){
