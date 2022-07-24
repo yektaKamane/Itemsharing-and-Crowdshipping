@@ -20,6 +20,7 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
 
         // fitness calculation
         calculate_fitness(fitness, population, population_size, data_size, supplies, requests, trips);
+        // print_fitness(fitness, population_size);
 
         // selection
         // print fitness values to see which selection fits better
@@ -107,8 +108,13 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
 
             if (delivery_type == 0){
                 // self-sourcing
-                // check feasibility first!!!!
-                sum += 10;
+                // check feasibility
+                double direct_trip_distance = get_distance(s_y, s_x, r_y, r_x);
+                double direct_trip_duration = direct_trip_distance / speed;
+                if (direct_trip_duration * 60.0 < 10){
+                    sum += 10;
+                }
+                
             }
             else if (delivery_type == 1){
                 // home del
@@ -120,14 +126,27 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
                                    + get_distance(r_y, r_x, td_y, td_x)
                                    - direct_trip_distance;
                 double detour_duration = detour_distance / speed;
-                sum += 15 - (30 * detour_duration);
+                if (detour_duration < 0.2 * direct_trip_duration){
+                    sum += 15 - (30 * detour_duration);
+                }
+                
             }
             else if (delivery_type == 2){
                 // neighborhood del
-                // check!!!
+                // check feasibility
+                double direct_trip_distance = get_distance(ts_y, ts_x, td_y, td_x);
+                double direct_trip_duration = direct_trip_distance / speed;
+                double detour_distance = get_distance(ts_y, ts_x, s_y, s_x)
+                                   + get_distance(s_y, s_x, td_y, td_x)
+                                   - direct_trip_distance;
+                double detour_duration = detour_distance / speed;
+                double demander_distance = get_distance(r_y, r_x, td_y, td_x);
+                double demander_duration = demander_distance / speed;
+                if ((detour_duration < 0.2 * direct_trip_duration) && (demander_duration * 60.0 < 10)){
+                    sum += 15 - (30 * detour_duration);
+                }
             }
         }
-
         fitness[i] = sum;
     }
 }
@@ -156,4 +175,11 @@ void print_population(int top, int intop, int ***population){
         }
         cout << "\n\n";
     }
+}
+
+void print_fitness(int *fitness, int population_size){
+    for (int i=0; i<population_size; i++){
+        cout << fitness[i] << " , ";
+    }
+    cout << "\n";
 }

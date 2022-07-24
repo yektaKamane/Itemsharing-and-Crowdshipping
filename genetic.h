@@ -16,3 +16,4 @@ void create_initial_population(int population_size, int data_size, int ***popula
 void print_population(int top, int intop, int ***population);
 void calculate_fitness(int *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip);
 double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude);
+void print_fitness(int *fitness, int population_size);
