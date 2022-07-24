@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstring> 
 #include <sstream>
+#include <cmath>
 #include <time.h>
 #include <algorithm>
 #include "genetic.h"
@@ -83,8 +84,11 @@ int main(){
 
     std::cout << "begin" << std::endl;
     srand(time(0));
-    int num_of_sets = 10;
-    int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
+    // int num_of_sets = 10;
+    // int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
+
+    int num_of_sets = 1;
+    int parts[] = {10};
 
     for (int i=0; i<num_of_sets; i++){
         for (int part : parts){
@@ -99,8 +103,10 @@ int main(){
             read_data_trip(i+1, part, trips);
 
             genetic_algorithm(supplies, requests, trips, part);
+            // free the memory allocated
         }
     }
+
 
     cout << "end" << endl;
     return 0;
