@@ -20,13 +20,12 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         
         // fitness calculation
         calculate_fitness(fitness, population, population_size, data_size, supplies, requests, trips);
-        // print_fitness(fitness, population_size);
+        print_fitness(fitness, population_size);
 
         // selection
         // print fitness values to see which selection fits better
         // try out different selection methods
-        int *selection_pool = (int *)malloc(population_size);
-
+        rank_select(fitness, population_size, population);
 
         // crossover
         // try out different crossover methods
@@ -150,24 +149,36 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
                 }
             }
         }
-        fitness[i] = sum;
+        fitness[i] = (int)sum;
     }
 }
 
-int rank_select(int *selection_pool, int *fitness){
-    int pool_size = 0;
+void rank_select(int *fitness, int population_size, int ***population){
+    int temp;
+    int **temp_p;
+    // sort the fitness array
+    for (int i=0; i<population_size-1; i++){
+        for (int j = 0; j < population_size - i - 1; j++){
+            if (fitness[j] < fitness[j + 1]){
+                // swap IDs in the fitness array
+                temp = fitness[j];
+                fitness[j] = fitness[j+1];
+                fitness[j+1] = temp;
 
-    // fill out later
+                // swap IDs in the population array
+                temp_p = population[j];
+                population[j] = population[j+1];
+                population[j+1] = temp_p;
+            }
+        }
+    }
 
-    return pool_size;
+    
 }
 
-int roulette_wheel_select(int *selection_pool, int *fitness){
-    int pool_size = 0;
-
+void roulette_wheel_select(int *selection_pool, int *fitness){
+    
     // fill out later
-
-    return pool_size;
 }
 
 double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude){
