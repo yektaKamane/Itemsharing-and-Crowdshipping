@@ -25,11 +25,14 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         // selection
         // print fitness values to see which selection fits better
         // try out different selection methods
-        rank_select(fitness, population_size, population);
+
+        // the index of selected populations
+        int *selection_pool = (int *)malloc(population_size * sizeof(int));
+        rank_select(fitness, population_size, population, selection_pool);
 
         // crossover
         // try out different crossover methods
-
+        
         // mutation
     }
     free(population);
@@ -153,7 +156,7 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
     }
 }
 
-void rank_select(int *fitness, int population_size, int ***population){
+void rank_select(int *fitness, int population_size, int ***population, int *selection_pool){
     int temp;
     int **temp_p;
     // sort the fitness array
@@ -173,7 +176,10 @@ void rank_select(int *fitness, int population_size, int ***population){
         }
     }
 
-    
+    for (int i=0; i<population_size/2; i++){
+        selection_pool[i] = i;
+        selection_pool[i + population_size/2] = i;
+    }
 }
 
 void roulette_wheel_select(int *selection_pool, int *fitness){
