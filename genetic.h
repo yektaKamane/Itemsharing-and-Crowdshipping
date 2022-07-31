@@ -18,3 +18,4 @@ void calculate_fitness (int *fitness, int ***population, int population_size, in
 double get_distance (double longitude, double latitude, double otherLongitude, double otherLatitude);
 void print_fitness (int *fitness, int population_size);
 void rank_select (int *fitness, int population_size, int ***population, int *selection_pool);
+void crossover(int population_size, int data_size, int ***population, int *selection_pool);

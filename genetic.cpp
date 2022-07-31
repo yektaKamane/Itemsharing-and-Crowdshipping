@@ -32,7 +32,8 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
 
         // crossover
         // try out different crossover methods
-        
+        crossover(population_size, data_size, population, selection_pool);
+
         // mutation
     }
     free(population);
@@ -185,6 +186,40 @@ void rank_select(int *fitness, int population_size, int ***population, int *sele
 void roulette_wheel_select(int *selection_pool, int *fitness){
     
     // fill out later
+}
+
+
+void crossover(int population_size, int data_size, int ***population, int *selection_pool){
+    int *seen = (int *)malloc(population_size * sizeof(int));
+    for (int i=0; i<population_size; i++) seen[i] = -1;
+    for (int i=0; i<population_size/2; i++){
+        // randomly pick two chromosomes
+        int random1 = (rand() % population_size-1) + 1;
+        while(seen[random1] != -1) random1 = (rand() % population_size-1) + 1;
+        seen[random1] = 1;
+        int random2 = (rand() % population_size-1) + 1;
+        while(seen[random2] != -1) random2 = (rand() % population_size-1) + 1;
+        seen[random2] = 1;
+
+        // cout << "random generations : " << selection_pool[random1] << " , " << selection_pool[random2] << endl;
+        // randomly pick two numbers in range of the population size
+        int rand_num1 = (rand() % data_size-1) + 1;
+        int rand_num2 = (rand() % 3) + 1;
+
+        // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
+
+        int population_index1 = selection_pool[random1];
+        int population_index2 = selection_pool[random2];
+        for (int i=0; i<rand_num2; i++){
+            for (int j=0; j<rand_num1; j++){
+                // swap everything before that cut
+                int temp = population[population_index1][i][j];
+                population[population_index1][i][j] = population[population_index2][i][j];
+                population[population_index2][i][j] = temp;
+            }
+        }
+    }
+    free(seen);
 }
 
 double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude){
