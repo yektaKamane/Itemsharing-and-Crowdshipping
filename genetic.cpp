@@ -6,7 +6,7 @@ using namespace std;
 
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size){
 
-    int population_size = 2 * data_size;
+    int population_size = 1 * data_size;
     int iteration_number = 100;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
@@ -35,8 +35,15 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         crossover(population_size, data_size, population, selection_pool);
 
         // mutation
+        // print_population(1, 10, population);
+        mutation(population_size, data_size, population);
+        // print_population(1, 10, population);
+
+        if (iteration == iteration_number-1) cout << data_size << " : " << fitness[0] << endl;
+        free(selection_pool);
     }
     free(population);
+    free(fitness);
 }
 
 
@@ -222,6 +229,30 @@ void crossover(int population_size, int data_size, int ***population, int *selec
     free(seen);
 }
 
+void mutation(int population_size, int data_size, int ***population){
+    // balances the occurrences of each id
+    for (int i=0; i<population_size; i++){
+        for (int j=0; j<2; j++){
+            int *seen = (int *)malloc(data_size * sizeof(int));
+            for (int n=0; n<data_size; n++) seen[n] = -1;
+            for (int k=0; k<data_size; k++){
+                int val = population[i][j][k];
+                if (seen[val] == -1){
+                    seen[val] = 1;
+                }
+                else{
+                    int counter = 0;
+                    while(seen[counter] != -1) counter++;
+                    population[i][j][k] = counter;
+                    population[i][2][k] = (population[i][2][k] + 1)%3;
+                    seen[counter] = 1;
+                }
+            }
+            free(seen);
+        }
+    }
+}
+
 double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude){
     double M_PI = 3.14159;
     double d1 = latitude * (M_PI / 180.0);
@@ -249,7 +280,7 @@ void print_population(int top, int intop, int ***population){
 }
 
 void print_fitness(int *fitness, int population_size){
-    for (int i=0; i<population_size; i++){
+    for (int i=0; i<10; i++){
         cout << fitness[i] << " , ";
     }
     cout << "\n";
