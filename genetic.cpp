@@ -1,49 +1,51 @@
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 #include <cmath>
 #include "genetic.h"
 using namespace std;
 
-void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size){
+void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
 
     int population_size = 1 * data_size;
-    int iteration_number = 100;
+    int iteration_number = 10;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
     int *fitness = (int *)malloc(population_size * sizeof(int));
-
+    int *selection_pool = (int *)malloc(population_size * sizeof(int));
     // create initial population
     create_initial_population(population_size, data_size, population);
-    // print_population(20, 10, population);
+    // print_population(4, 4, population);
 
     for(int iteration=0; iteration<iteration_number; iteration++){
-        
         // fitness calculation
         calculate_fitness(fitness, population, population_size, data_size, supplies, requests, trips);
+        print_population(4, 4, population);
         print_fitness(fitness, population_size);
-
+        
         // selection
         // print fitness values to see which selection fits better
         // try out different selection methods
 
         // the index of selected populations
-        int *selection_pool = (int *)malloc(population_size * sizeof(int));
         rank_select(fitness, population_size, population, selection_pool);
-
+        print_population(4, 4, population);
         // crossover
         // try out different crossover methods
         crossover(population_size, data_size, population, selection_pool);
 
         // mutation
-        // print_population(1, 10, population);
         mutation(population_size, data_size, population);
-        // print_population(1, 10, population);
 
-        if (iteration == iteration_number-1) cout << data_size << " : " << fitness[0] << endl;
-        free(selection_pool);
+        if (iteration == iteration_number-1){
+            rank_select(fitness, population_size, population, selection_pool);
+            cout << data_size << " : " << fitness[0] << endl;
+        }
     }
+    // write_results(data_size, population, number_of_set);
     free(population);
     free(fitness);
+    free(selection_pool);
 }
 
 
@@ -160,7 +162,7 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
                 }
             }
         }
-        fitness[i] = (int)sum;
+        fitness[i] = sum;
     }
 }
 
@@ -214,7 +216,7 @@ void crossover(int population_size, int data_size, int ***population, int *selec
         int rand_num2 = (rand() % 3) + 1;
 
         // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
-
+        
         int population_index1 = selection_pool[random1];
         int population_index2 = selection_pool[random2];
         for (int i=0; i<rand_num2; i++){
@@ -231,9 +233,9 @@ void crossover(int population_size, int data_size, int ***population, int *selec
 
 void mutation(int population_size, int data_size, int ***population){
     // balances the occurrences of each id
+    int *seen = (int *)malloc(data_size * sizeof(int));
     for (int i=0; i<population_size; i++){
         for (int j=0; j<2; j++){
-            int *seen = (int *)malloc(data_size * sizeof(int));
             for (int n=0; n<data_size; n++) seen[n] = -1;
             for (int k=0; k<data_size; k++){
                 int val = population[i][j][k];
@@ -248,21 +250,39 @@ void mutation(int population_size, int data_size, int ***population){
                     seen[counter] = 1;
                 }
             }
-            free(seen);
         }
     }
+    free(seen);
 }
 
 double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude){
-    double M_PI = 3.14159;
-    double d1 = latitude * (M_PI / 180.0);
-    double num1 = longitude * (M_PI / 180.0);
-    double d2 = otherLatitude * (M_PI / 180.0);
-    double num2 = otherLongitude * (M_PI / 180.0) - num1;
+    double pi = 3.14159;
+    double d1 = latitude * (pi / 180.0);
+    double num1 = longitude * (pi / 180.0);
+    double d2 = otherLatitude * (pi / 180.0);
+    double num2 = otherLongitude * (pi / 180.0) - num1;
     double d3 = pow(sin((d2 - d1) / 2.0), 2.0) + cos(d1) * cos(d2) * pow(sin(num2 / 2.0), 2.0);
 
     double res = 6376500.0 * (2.0 * atan2(sqrt(d3), sqrt(1.0 - d3)));
-    return (res + 0.1) / 1000;
+    return (res) / 1000;
+}
+
+void write_results(int data_size, int ***population, int number_of_set){
+    string MyText = "";
+    string dir = "D:\\Project_Data\\Generated_Coordinates\\Sample" + std::to_string(number_of_set) + "\\NewResult" + std::to_string(data_size) + "\\assignment.txt";
+    // cout << dir << endl;
+    for (int i=0; i<data_size; i++){
+        MyText += "sup id: " + std::to_string(i);
+        MyText += "\nreq id: " + std::to_string(population[0][0][i]);
+        MyText += "\ntrip id: " + std::to_string(population[0][1][i]);
+        MyText += "\ndel type: " + std::to_string(population[0][2][i]);
+        MyText += "\n------\n";
+    }
+    // cout << MyText << endl;
+    ofstream myFile;
+    myFile.open(dir);
+    myFile << MyText;
+    myFile.close();
 }
 
 void print_population(int top, int intop, int ***population){
@@ -280,7 +300,7 @@ void print_population(int top, int intop, int ***population){
 }
 
 void print_fitness(int *fitness, int population_size){
-    for (int i=0; i<10; i++){
+    for (int i=0; i<population_size; i++){
         cout << fitness[i] << " , ";
     }
     cout << "\n";

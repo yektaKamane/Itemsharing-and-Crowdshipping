@@ -88,10 +88,11 @@ int main(){
     // int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
 
     int num_of_sets = 1;
-    int parts[] = {200};
+    int parts[] = {4};
 
     for (int i=0; i<num_of_sets; i++){
         for (int part : parts){
+            // std::cout << "parts" << std::endl;
             Node *supplies = (Node *)malloc(part * sizeof(Node));
             Node *requests = (Node *)malloc(part * sizeof(Node));
             Trip *trips    = (Trip *)malloc(part * sizeof(Trip));
@@ -102,7 +103,7 @@ int main(){
             // read crowdshippers
             read_data_trip(i+1, part, trips);
 
-            genetic_algorithm(supplies, requests, trips, part);
+            genetic_algorithm(supplies, requests, trips, part, i+1);
             // free the memory allocated
             free(supplies);
             free(requests);
