@@ -87,31 +87,67 @@ int main(){
     // int num_of_sets = 10;
     // int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
 
-    int num_of_sets = 1;
-    int parts[] = {4};
+    // int num_of_sets = 1;
+    // int parts[] = {4};
 
-    for (int i=0; i<num_of_sets; i++){
-        for (int part : parts){
-            // std::cout << "parts" << std::endl;
-            Node *supplies = (Node *)malloc(part * sizeof(Node));
-            Node *requests = (Node *)malloc(part * sizeof(Node));
-            Trip *trips    = (Trip *)malloc(part * sizeof(Trip));
-            // read supplies
-            read_data_node(i+1, 0, part, supplies);
-            // read requests
-            read_data_node(i+1, 1, part, requests);
-            // read crowdshippers
-            read_data_trip(i+1, part, trips);
+    // for (int i=0; i<num_of_sets; i++){
+    //     for (int part : parts){
+    //         // std::cout << "parts" << std::endl;
+    //         Node *supplies = (Node *)malloc(part * sizeof(Node));
+    //         Node *requests = (Node *)malloc(part * sizeof(Node));
+    //         Trip *trips    = (Trip *)malloc(part * sizeof(Trip));
+    //         // read supplies
+    //         read_data_node(i+1, 0, part, supplies);
+    //         // read requests
+    //         read_data_node(i+1, 1, part, requests);
+    //         // read crowdshippers
+    //         read_data_trip(i+1, part, trips);
 
-            genetic_algorithm(supplies, requests, trips, part, i+1);
-            // free the memory allocated
-            free(supplies);
-            free(requests);
-            free(trips);
+    //         genetic_algorithm(supplies, requests, trips, part, i+1);
+    //         // free the memory allocated
+    //         free(supplies);
+    //         free(requests);
+    //         free(trips);
+    //     }
+    // }
+
+    // testing functions
+
+    int pop_size = 4;
+    int data_size = 4;
+    int ***population = (int ***)malloc(pop_size * sizeof(int **));
+    int *fitness = (int *)malloc(pop_size * sizeof(int));
+    int *selection_pool = (int *)malloc(pop_size * sizeof(int));
+
+    for (int i=0; i<pop_size; i++){
+        int **temp = (int **)malloc(3 * sizeof(int *));
+        for (int j=0; j<3; j++){
+            int *temp2 = (int *)malloc(data_size * sizeof(int));
+            temp[j] = temp2;
+        }
+        population[i] = temp;
+    }
+
+    for (int i=0; i<pop_size; i++){
+        for (int j=0; j<3; j++){
+            for (int k=0; k<data_size; k++){
+                population[i][j][k] = i;
+            }
         }
     }
 
+    for (int i=0; i<pop_size; i++){
+        fitness[i] = i;
+    }
 
+    print_population(4, 4, population);
+    print_fitness(fitness, pop_size);
+    rank_select(fitness, pop_size, population, selection_pool);
+
+    print_population(4, 4, population);
+    print_fitness(fitness, pop_size);
+    print_fitness(selection_pool, pop_size);
+    
     cout << "end" << endl;
     return 0;
 }
