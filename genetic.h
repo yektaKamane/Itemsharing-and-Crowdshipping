@@ -20,4 +20,4 @@ void print_fitness (int *fitness, int population_size);
 void rank_select (int *fitness, int population_size, int ***population, int *selection_pool);
 void crossover(int population_size, int data_size, int ***population, int *selection_pool);
 void mutation(int population_size, int data_size, int ***population);
-void write_results(int data_size, int ***population, int number_of_set);
+void write_results(int data_size, int ***population, int number_of_set, Node *supply, Node *req, Trip *trip);
