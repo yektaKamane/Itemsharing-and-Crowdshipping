@@ -79,6 +79,19 @@ void read_data_trip(int index, int data_size, Trip *ptr){
     MyReadFile.close();
 }
 
+double average_travel_time(Trip *trips, int size){
+    double sum = 0.0;
+    double speed = 30.0;
+    for (int i=0; i<size; i++){
+        double time = get_distance(trips[i].src.y, trips[i].src.x, trips[i].dest.y, trips[i].dest.x) / speed * 60.0;
+        sum += time;
+        if (time < 10.0) cout << i+1 << " : " << time << endl;
+    }
+
+    double average = sum/size;
+    cout << average << endl;
+    return average;
+}
 
 int main(){
 
@@ -103,7 +116,8 @@ int main(){
             // read crowdshippers
             read_data_trip(i+1, part, trips);
 
-            genetic_algorithm(supplies, requests, trips, part, i+1);
+            average_travel_time(trips, part);
+            // genetic_algorithm(supplies, requests, trips, part, i+1);
             // free the memory allocated
             free(supplies);
             free(requests);

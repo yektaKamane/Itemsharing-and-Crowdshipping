@@ -20,5 +20,7 @@ void print_fitness (int *fitness, int population_size);
 void rank_select (int *fitness, int population_size, int ***population, int *selection_pool);
 void roulette_wheel_select(int *fitness, int population_size, int ***population, int *selection_pool);
 void one_point_crossover(int population_size, int data_size, int ***population, int *selection_pool);
+void two_point_crossover(int population_size, int data_size, int ***population, int *selection_pool);
+void small_crossover(int population_size, int data_size, int ***population, int *selection_pool);
 void mutation(int population_size, int data_size, int ***population, Node *supply, Node *req, Trip *trip);
 void write_results(int data_size, int ***population, int number_of_set, Node *supply, Node *req, Trip *trip);

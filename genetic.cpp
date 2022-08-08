@@ -7,8 +7,8 @@ using namespace std;
 
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
 
-    int population_size = 2 * data_size;
-    int iteration_number = 10;
+    int population_size = data_size;
+    int iteration_number = 1000;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
     int *fitness = (int *)malloc(population_size * sizeof(int));
@@ -22,19 +22,18 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         calculate_fitness(fitness, population, population_size, data_size, supplies, requests, trips);
         // print_population(4, 4, population);
         
-        
         // selection
         // print fitness values to see which selection fits better
         // try out different selection methods
 
         // the index of selected populations
-        // rank_select(fitness, population_size, population, selection_pool);
-        roulette_wheel_select(fitness, population_size, population, selection_pool);
-        print_fitness(fitness, 20);
+        rank_select(fitness, population_size, population, selection_pool);
+        // roulette_wheel_select(fitness, population_size, population, selection_pool);
+        print_fitness(fitness, 5);
         // print_population(4, 4, population);
         // crossover
         // try out different crossover methods
-        one_point_crossover(population_size, data_size, population, selection_pool);
+        small_crossover(population_size, data_size, population, selection_pool);
 
         // mutation
         mutation(population_size, data_size, population, supplies, requests, trips);
@@ -159,7 +158,7 @@ void calculate_fitness(int *fitness, int ***population, int population_size, int
                 double detour_duration = detour_distance / speed;
                 double demander_distance = get_distance(r_y, r_x, td_y, td_x);
                 double demander_duration = demander_distance / speed;
-                if ((detour_duration <= 0.2 * direct_trip_duration) && (demander_duration * 60.0 <= 10)){
+                if ((detour_duration <= 0.2 * direct_trip_duration) && (demander_duration * 60.0 <= 10.0)){
                     // cout << 15 - (30 * detour_duration) << endl;
                     sum += 15 - (30 * detour_duration);
                 }
@@ -229,6 +228,8 @@ void roulette_wheel_select(int *fitness, int population_size, int ***population,
         // cout << "j : " << j << endl;
         // cout << "cum pro : " << cum_probility[j] << endl;
     }
+    free(abs_probility);
+    free(cum_probility);
 }
 
 
@@ -261,6 +262,76 @@ void one_point_crossover(int population_size, int data_size, int ***population, 
                 population[population_index2][i][j] = temp;
             }
         }
+    }
+    free(seen);
+}
+
+void two_point_crossover(int population_size, int data_size, int ***population, int *selection_pool){
+    int *seen = (int *)malloc(population_size * sizeof(int));
+    for (int i=0; i<population_size; i++) seen[i] = -1;
+    for (int i=0; i<population_size/2; i++){
+        // randomly pick two chromosomes
+        int random1 = (rand() % population_size-1) + 1;
+        while(seen[random1] != -1) random1 = (rand() % population_size-1) + 1;
+        seen[random1] = 1;
+        int random2 = (rand() % population_size-1) + 1;
+        while(seen[random2] != -1) random2 = (rand() % population_size-1) + 1;
+        seen[random2] = 1;
+
+        // cout << "random generations : " << selection_pool[random1] << " , " << selection_pool[random2] << endl;
+        // randomly pick two numbers in range of the population size        
+        int rand_num = (rand() % 3) + 1;
+        int rand_num1 = (rand() % data_size-1) + 1;
+        int rand_num2 = (rand() % data_size-1) + 1;
+        int min = std::min(rand_num1, rand_num2);
+        int max = std::max(rand_num1, rand_num2);
+        // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
+        
+        int population_index1 = selection_pool[random1];
+        int population_index2 = selection_pool[random2];
+        for (int i=0; i<rand_num; i++){
+            for (int j=min; j<max; j++){
+                // swap everything before that cut
+                int temp = population[population_index1][i][j];
+                population[population_index1][i][j] = population[population_index2][i][j];
+                population[population_index2][i][j] = temp;
+            }
+        }
+    }
+    free(seen);
+}
+
+void small_crossover(int population_size, int data_size, int ***population, int *selection_pool){
+    int *seen = (int *)malloc(population_size * sizeof(int));
+    for (int i=0; i<population_size; i++) seen[i] = -1;
+    for (int i=0; i<population_size/2; i++){
+        // randomly pick two chromosomes
+        int random1 = (rand() % population_size-1) + 1;
+        while(seen[random1] != -1) random1 = (rand() % population_size-1) + 1;
+        seen[random1] = 1;
+        int random2 = (rand() % population_size-1) + 1;
+        while(seen[random2] != -1) random2 = (rand() % population_size-1) + 1;
+        seen[random2] = 1;
+
+        // randomly pick two numbers in range of the population size        
+        int rand_num1 = (rand() % data_size-1) + 1;
+        int rand_num2 = (rand() % data_size-1) + 1;
+        int rand_num3 = (rand() % data_size-1) + 1;
+
+        int points[] = {rand_num1, rand_num2, rand_num3};
+        // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
+        
+        int population_index1 = selection_pool[random1];
+        int population_index2 = selection_pool[random2];
+
+        for (int i=0; i<3; i++){
+            for (int point : points){
+                int temp = population[population_index1][i][point];
+                population[population_index1][i][point] = population[population_index2][i][point];
+                population[population_index2][i][point] = temp;
+            }
+        }
+        // cout << "done" << endl;
     }
     free(seen);
 }
@@ -358,7 +429,8 @@ double get_distance(double longitude, double latitude, double otherLongitude, do
     double d3 = pow(sin((d2 - d1) / 2.0), 2.0) + cos(d1) * cos(d2) * pow(sin(num2 / 2.0), 2.0);
 
     double res = 6376500.0 * (2.0 * atan2(sqrt(d3), sqrt(1.0 - d3)));
-    return (res) / 1000;
+    // cout << res *0.6 / 1000 << endl;
+    return (res * 0.65) / 1000 ;
     // return 0;
 }
 
