@@ -14,11 +14,11 @@ class Trip {
 void genetic_algorithm (Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set);
 void create_initial_population (int population_size, int data_size, int ***population);
 void print_population (int top, int intop, int ***population);
-void calculate_fitness (int *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip);
+void calculate_fitness (double *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip);
 double get_distance (double longitude, double latitude, double otherLongitude, double otherLatitude);
-void print_fitness (int *fitness, int population_size);
-void rank_select (int *fitness, int population_size, int ***population, int *selection_pool);
-void roulette_wheel_select(int *fitness, int population_size, int ***population, int *selection_pool);
+void print_fitness (double *fitness, int population_size);
+void rank_select (double *fitness, int population_size, int ***population, int *selection_pool);
+void roulette_wheel_select(double *fitness, int population_size, int ***population, int *selection_pool);
 void one_point_crossover(int population_size, int data_size, int ***population, int *selection_pool);
 void two_point_crossover(int population_size, int data_size, int ***population, int *selection_pool);
 void small_crossover(int population_size, int data_size, int ***population, int *selection_pool);
