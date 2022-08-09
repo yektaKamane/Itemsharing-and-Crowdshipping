@@ -8,7 +8,7 @@ using namespace std;
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
 
     int population_size = 100;
-    int iteration_number = 100;
+    int iteration_number = 500;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
     double *fitness = (double *)malloc(population_size * sizeof(double));
@@ -38,7 +38,7 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         // print_population(4, 4, population);
         // crossover
         // try out different crossover methods
-        small_crossover(population_size, data_size, population, selection_pool);
+        small_crossover(population_size, data_size, population, selection_pool, supplies, requests, trips);
 
         // mutation
         mutation(population_size, data_size, population, supplies, requests, trips);
@@ -98,7 +98,21 @@ void create_initial_population(int population_size, int data_size, int ***popula
     // if (data_size == 10){
     //     cout << population[19][1][9] << endl;
     // }
-    
+}
+
+double get_max_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
+    double max_profit = 0.0;
+    int best_type = 0;
+    for (int i=0; i<3; i++){    
+        population[pop_index][2][chrmsm_index] = i;
+        double profit = get_profit(population, supply, req, trip, pop_index, chrmsm_index);
+        if (profit > max_profit){
+            max_profit = profit;
+            best_type = i;
+        }
+    }
+    population[pop_index][2][chrmsm_index] = best_type;
+    return max_profit;
 }
 
 double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
@@ -157,6 +171,7 @@ double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int po
     }
     return profit;
 }
+
 
 void calculate_fitness(double *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip){
     double speed = 30;
@@ -302,7 +317,7 @@ void two_point_crossover(int population_size, int data_size, int ***population, 
     free(seen);
 }
 
-void small_crossover(int population_size, int data_size, int ***population, int *selection_pool){
+void small_crossover(int population_size, int data_size, int ***population, int *selection_pool, Node *supply, Node *req, Trip *trip){
     int *seen = (int *)malloc(population_size * sizeof(int));
     for (int i=0; i<population_size; i++) seen[i] = -1;
     for (int i=0; i<population_size/2; i++){
@@ -325,12 +340,16 @@ void small_crossover(int population_size, int data_size, int ***population, int 
         int population_index1 = selection_pool[random1];
         int population_index2 = selection_pool[random2];
 
-        for (int i=0; i<3; i++){
+        for (int i=0; i<2; i++){
             for (int point : points){
                 int temp = population[population_index1][i][point];
                 population[population_index1][i][point] = population[population_index2][i][point];
-                population[population_index2][i][point] = temp;
+                population[population_index2][i][point] = temp;                
             }
+        }
+        for (int point : points){
+            get_max_profit(population, supply, req, trip, population_index1, point);  
+            get_max_profit(population, supply, req, trip, population_index2, point);  
         }
         // cout << "done" << endl;
     }
@@ -357,7 +376,8 @@ void mutation(int population_size, int data_size, int ***population, Node *suppl
                     }
                     population[i][j][k] = counter;
                     seen[counter] = 1;
-                                                
+
+                    get_max_profit(population, supply, req, trip, i, k);  
                 }
             }
         }
