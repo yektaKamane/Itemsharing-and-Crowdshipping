@@ -104,11 +104,11 @@ int main(){
 
     std::cout << "begin" << std::endl;
     srand(time(0));
-    // int num_of_sets = 10;
+    int num_of_sets = 1;
     // int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
 
-    int num_of_sets = 1;
-    int parts[] = {75};
+    // int num_of_sets = 1;
+    int parts[] = {10};
 
     for (int i=0; i<num_of_sets; i++){
         for (int part : parts){
