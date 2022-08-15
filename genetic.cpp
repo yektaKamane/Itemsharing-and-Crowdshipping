@@ -2,13 +2,15 @@
 #include <cstdlib>
 #include <fstream>
 #include <cmath>
+#include <chrono>
+#include <ctime> 
 #include "genetic.h"
 using namespace std;
 
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
-
-    int population_size = 100;
-    int iteration_number = 500;
+    
+    int population_size = 50;
+    int iteration_number = 200;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
     double *fitness = (double *)malloc(population_size * sizeof(double));
@@ -16,7 +18,7 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
     // create initial population
     create_initial_population(population_size, data_size, population);
     // print_population(4, 4, population);
-
+    auto start = std::chrono::system_clock::now();
     for(int iteration=0; iteration<iteration_number; iteration++){
         // fitness calculation
         calculate_fitness(fitness, population, population_size, data_size, supplies, requests, trips);
@@ -28,24 +30,28 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
 
         // the index of selected populations
         rank_select(fitness, population_size, population, selection_pool);
+        write_temp(fitness[0], number_of_set, data_size);
+        // roulette_wheel_select(fitness, population_size, population, selection_pool);
         if (iteration == iteration_number-1){
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = end-start;
+            cout << "elapsed time: " << elapsed_seconds.count() << endl;
             write_results(data_size, population, number_of_set, supplies, requests, trips);
             cout << data_size << " : " << fitness[0] << endl;
             break;
         }
-        // roulette_wheel_select(fitness, population_size, population, selection_pool);
-        // print_fitness(fitness, 20);
-        // print_population(4, 4, population);
+
         // crossover
         // try out different crossover methods
         small_crossover(population_size, data_size, population, selection_pool, supplies, requests, trips);
-
         // mutation
         mutation(population_size, data_size, population, supplies, requests, trips);
         // print_fitness(fitness, 5);
         
+        
     }
     // write_results(data_size, population, number_of_set, supplies, requests, trips);
+    
     free(population);
     free(fitness);
     free(selection_pool);
@@ -376,9 +382,8 @@ void mutation(int population_size, int data_size, int ***population, Node *suppl
                     }
                     population[i][j][k] = counter;
                     seen[counter] = 1;
-
-                    get_max_profit(population, supply, req, trip, i, k);  
                 }
+                get_max_profit(population, supply, req, trip, i, k);  
             }
         }
     }
@@ -397,6 +402,14 @@ double get_distance(double longitude, double latitude, double otherLongitude, do
     // cout << res *0.6 / 1000 << endl;
     return (res * 0.6) / 1000 ;
     // return 0;
+}
+
+void write_temp(double fit_value, int set_number, int data_size){
+    string dir = "D:\\Project_Data\\Generated_Coordinates\\Sample" + to_string(set_number) + "\\NewResult" + to_string(data_size) + "\\iteration.csv";
+    // std::ofstream myfile;
+    std::ofstream myfile( dir, std::ios::app ) ;
+    myfile << fit_value << endl;
+    myfile.close();
 }
 
 void write_results(int data_size, int ***population, int number_of_set, Node *supply, Node *req, Trip *trip){

@@ -26,3 +26,4 @@ void mutation(int population_size, int data_size, int ***population, Node *suppl
 void write_results(int data_size, int ***population, int number_of_set, Node *supply, Node *req, Trip *trip);
 double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index);
 double get_max_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index);
+void write_temp(double fit_value, int set_number, int data_size);
