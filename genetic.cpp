@@ -9,7 +9,7 @@ using namespace std;
 
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
     
-    int population_size = 50;
+    int population_size = 100;
     int iteration_number = 200;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
@@ -84,9 +84,9 @@ void create_initial_population(int population_size, int data_size, int ***popula
             for (int k=0; k<data_size; k++){
                 // filling each chromosome with unique random numbers 
                 // in the range of the dataset
-                int random = (rand() % data_size-1) + 1;
+                int random = rand() % data_size;
                 while(seen[random] != -1){
-                    random = (rand() % data_size-1) + 1;
+                    random = rand() % data_size;
                 }
                 population[i][j][k] = random;
                 seen[random] = 1;
@@ -225,30 +225,20 @@ void roulette_wheel_select(double *fitness, int population_size, int ***populati
         sum_of_fitness += fitness[i];
     }
 
-    // cout << "sum of fitness : " << sum_of_fitness << endl;
-
     for (int i=0; i<population_size; i++) {
         abs_probility[i] = (float)fitness[i]/sum_of_fitness;
-        // cout << abs_probility[i] << " , ";
     }
-    // cout << "\n\n";
 
     for (int i=0; i<population_size; i++) {
         cum_probility[i] = sum_of_prob + abs_probility[i];
         sum_of_prob = cum_probility[i];
-        // cout << cum_probility[i] << " , ";
     }
-    // cout << "\n\n";
 
     for (int i=0; i<population_size; i++){
         float random = (float) rand()/RAND_MAX;
         int j=0;
         while(cum_probility[j]<random && j<population_size-1) j++;
         selection_pool[i] = j;
-        // cout << "random : " << random << endl;
-        // cout << "j : " << j << endl;
-        // cout << "cum pro : " << cum_probility[j] << endl;
-        // cout << "\n";
     }
     free(abs_probility);
     free(cum_probility);
@@ -260,19 +250,16 @@ void one_point_crossover(int population_size, int data_size, int ***population, 
     for (int i=0; i<population_size; i++) seen[i] = -1;
     for (int i=0; i<population_size/2; i++){
         // randomly pick two chromosomes
-        int random1 = (rand() % population_size-1) + 1;
-        while(seen[random1] != -1) random1 = (rand() % population_size-1) + 1;
+        int random1 = rand() % population_size;
+        while(seen[random1] != -1) random1 = rand() % population_size-1;
         seen[random1] = 1;
-        int random2 = (rand() % population_size-1) + 1;
-        while(seen[random2] != -1) random2 = (rand() % population_size-1) + 1;
+        int random2 = rand() % population_size;
+        while(seen[random2] != -1) random2 = rand() % population_size;
         seen[random2] = 1;
 
-        // cout << "random generations : " << selection_pool[random1] << " , " << selection_pool[random2] << endl;
         // randomly pick two numbers in range of the population size
-        int rand_num1 = (rand() % data_size-1) + 1;
-        int rand_num2 = (rand() % 3) + 1;
-
-        // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
+        int rand_num1 = rand() % data_size;
+        int rand_num2 = (rand() % 3);
         
         int population_index1 = selection_pool[random1];
         int population_index2 = selection_pool[random2];
@@ -293,21 +280,19 @@ void two_point_crossover(int population_size, int data_size, int ***population, 
     for (int i=0; i<population_size; i++) seen[i] = -1;
     for (int i=0; i<population_size/2; i++){
         // randomly pick two chromosomes
-        int random1 = (rand() % population_size-1) + 1;
-        while(seen[random1] != -1) random1 = (rand() % population_size-1) + 1;
+        int random1 = rand() % population_size;
+        while(seen[random1] != -1) random1 = rand() % population_size;
         seen[random1] = 1;
         int random2 = (rand() % population_size-1) + 1;
-        while(seen[random2] != -1) random2 = (rand() % population_size-1) + 1;
+        while(seen[random2] != -1) random2 = rand() % population_size;
         seen[random2] = 1;
 
-        // cout << "random generations : " << selection_pool[random1] << " , " << selection_pool[random2] << endl;
         // randomly pick two numbers in range of the population size        
-        int rand_num = (rand() % 3) + 1;
-        int rand_num1 = (rand() % data_size-1) + 1;
-        int rand_num2 = (rand() % data_size-1) + 1;
+        int rand_num = (rand() % 3);
+        int rand_num1 = rand() % data_size;
+        int rand_num2 = rand() % data_size;
         int min = std::min(rand_num1, rand_num2);
         int max = std::max(rand_num1, rand_num2);
-        // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
         
         int population_index1 = selection_pool[random1];
         int population_index2 = selection_pool[random2];
@@ -328,20 +313,19 @@ void small_crossover(int population_size, int data_size, int ***population, int 
     for (int i=0; i<population_size; i++) seen[i] = -1;
     for (int i=0; i<population_size/2; i++){
         // randomly pick two chromosomes
-        int random1 = (rand() % population_size-1) + 1;
-        while(seen[random1] != -1) random1 = (rand() % population_size-1) + 1;
+        int random1 = rand() % population_size;
+        while(seen[random1] != -1) random1 = rand() % population_size;
         seen[random1] = 1;
-        int random2 = (rand() % population_size-1) + 1;
-        while(seen[random2] != -1) random2 = (rand() % population_size-1) + 1;
+        int random2 = rand() % population_size;
+        while(seen[random2] != -1) random2 = rand() % population_size;
         seen[random2] = 1;
 
         // randomly pick two numbers in range of the population size        
-        int rand_num1 = (rand() % data_size-1) + 1;
-        int rand_num2 = (rand() % data_size-1) + 1;
-        int rand_num3 = (rand() % data_size-1) + 1;
+        int rand_num1 = rand() % data_size;
+        int rand_num2 = rand() % data_size;
+        int rand_num3 = rand() % data_size;
 
         int points[] = {rand_num1, rand_num2, rand_num3};
-        // cout << "random cuts : " << rand_num1 << " , " << rand_num2 << endl;
         
         int population_index1 = selection_pool[random1];
         int population_index2 = selection_pool[random2];
@@ -357,7 +341,6 @@ void small_crossover(int population_size, int data_size, int ***population, int 
             get_max_profit(population, supply, req, trip, population_index1, point);  
             get_max_profit(population, supply, req, trip, population_index2, point);  
         }
-        // cout << "done" << endl;
     }
     free(seen);
 }
@@ -378,14 +361,19 @@ void mutation(int population_size, int data_size, int ***population, Node *suppl
                     while(seen[counter] != -1) {
                         if (counter >= data_size) counter = 0;
                         else counter++;
-                        // cout << counter << endl;
                     }
                     population[i][j][k] = counter;
                     seen[counter] = 1;
-                }
-                get_max_profit(population, supply, req, trip, i, k);  
+                    get_max_profit(population, supply, req, trip, i, k);  
+                } 
             }
         }
+        // swap two items in one chromo
+        int random1 = rand() % data_size;
+        int random2 = rand() % data_size;
+        while (random2 == random1) random2 = rand() % data_size;
+        int element = (rand() % 2);
+
     }
     free(seen);
 }
@@ -399,14 +387,11 @@ double get_distance(double longitude, double latitude, double otherLongitude, do
     double d3 = pow(sin((d2 - d1) / 2.0), 2.0) + cos(d1) * cos(d2) * pow(sin(num2 / 2.0), 2.0);
 
     double res = 6376500.0 * (2.0 * atan2(sqrt(d3), sqrt(1.0 - d3)));
-    // cout << res *0.6 / 1000 << endl;
     return (res * 0.6) / 1000 ;
-    // return 0;
 }
 
 void write_temp(double fit_value, int set_number, int data_size){
     string dir = "D:\\Project_Data\\Generated_Coordinates\\Sample" + to_string(set_number) + "\\NewResult" + to_string(data_size) + "\\iteration.csv";
-    // std::ofstream myfile;
     std::ofstream myfile( dir, std::ios::app ) ;
     myfile << fit_value << endl;
     myfile.close();
