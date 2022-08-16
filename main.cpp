@@ -81,11 +81,11 @@ void read_data_trip(int index, int data_size, Trip *ptr){
 
 double average_travel_time(Trip *trips, int size){
     double sum = 0.0;
-    double speed = 30.0;
+    double speed = 50.0;
     for (int i=0; i<size; i++){
         double time = get_distance(trips[i].src.y, trips[i].src.x, trips[i].dest.y, trips[i].dest.x) / speed * 60.0;
         sum += time;
-        if (time < 10.0) cout << i+1 << " : " << time << endl;
+        if (time < 100.0) cout << i+1 << " : " << time << endl;
     }
     double average = (double)sum/size;
     cout << "average : " << average << endl;
@@ -104,11 +104,11 @@ int main(){
 
     std::cout << "begin" << std::endl;
     srand(time(0));
-    int num_of_sets = 1;
-    int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
-
     // int num_of_sets = 1;
-    // int parts[] = {200};
+    // int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
+
+    int num_of_sets = 1;
+    int parts[] = {100};
 
     for (int i=0; i<num_of_sets; i++){
         for (int part : parts){

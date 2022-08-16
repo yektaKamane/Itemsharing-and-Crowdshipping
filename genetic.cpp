@@ -10,7 +10,7 @@ using namespace std;
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
     
     int population_size = 100;
-    int iteration_number = 200;
+    int iteration_number = 400;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
     double *fitness = (double *)malloc(population_size * sizeof(double));
@@ -30,8 +30,9 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
 
         // the index of selected populations
         rank_select(fitness, population_size, population, selection_pool);
-        write_temp(fitness[0], number_of_set, data_size);
         // roulette_wheel_select(fitness, population_size, population, selection_pool);
+        write_temp(fitness[0], number_of_set, data_size);
+        
         if (iteration == iteration_number-1){
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed_seconds = end-start;
@@ -44,13 +45,10 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         // crossover
         // try out different crossover methods
         small_crossover(population_size, data_size, population, selection_pool, supplies, requests, trips);
+        // two_point_crossover(population_size, data_size, population, selection_pool);
         // mutation
-        mutation(population_size, data_size, population, supplies, requests, trips);
-        // print_fitness(fitness, 5);
-        
-        
+        mutation(population_size, data_size, population, supplies, requests, trips);            
     }
-    // write_results(data_size, population, number_of_set, supplies, requests, trips);
     
     free(population);
     free(fitness);
@@ -123,7 +121,7 @@ double get_max_profit(int ***population, Node *supply, Node *req, Trip *trip, in
 
 double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
     double profit = 0.0;
-    double speed = 30.0;
+    double speed = 50.0;
     int delivery_type = population[pop_index][2][chrmsm_index];
     // get the coordinates of the supplier
     double s_x = supply[chrmsm_index].x;
@@ -180,7 +178,6 @@ double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int po
 
 
 void calculate_fitness(double *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip){
-    double speed = 30;
     for (int i=0; i<population_size; i++){
         double sum = 0;
         for (int j=0; j<data_size; j++){
@@ -374,6 +371,17 @@ void mutation(int population_size, int data_size, int ***population, Node *suppl
         while (random2 == random1) random2 = rand() % data_size;
         int element = (rand() % 2);
 
+        double current_profit = get_max_profit(population, supply, req, trip, i, random1) + get_max_profit(population, supply, req, trip, i, random2);
+        int temp1 = population[i][element][random1];
+        int temp2 = population[i][element][random2];
+        population[i][element][random1] = temp2;
+        population[i][element][random2] = temp1;
+        double new_profit = get_max_profit(population, supply, req, trip, i, random1) + get_max_profit(population, supply, req, trip, i, random2);
+        if ( new_profit < current_profit){
+            population[i][element][random1] = temp1;
+            population[i][element][random2] = temp2;
+        }
+
     }
     free(seen);
 }
@@ -387,7 +395,7 @@ double get_distance(double longitude, double latitude, double otherLongitude, do
     double d3 = pow(sin((d2 - d1) / 2.0), 2.0) + cos(d1) * cos(d2) * pow(sin(num2 / 2.0), 2.0);
 
     double res = 6376500.0 * (2.0 * atan2(sqrt(d3), sqrt(1.0 - d3)));
-    return (res * 0.6) / 1000 ;
+    return (res * 1.2) / 1000 ;
 }
 
 void write_temp(double fit_value, int set_number, int data_size){
