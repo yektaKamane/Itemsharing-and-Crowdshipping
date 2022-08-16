@@ -10,10 +10,10 @@ using namespace std;
 void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_size, int number_of_set){
     
     int population_size = 100;
-    int iteration_number = 400;
+    int iteration_number = 100;
 
     int ***population = (int ***)malloc(population_size * sizeof(int **));
-    double *fitness = (double *)malloc(population_size * sizeof(double));
+    float *fitness = (float *)malloc(population_size * sizeof(float));
     int *selection_pool = (int *)malloc(population_size * sizeof(int));
     // create initial population
     create_initial_population(population_size, data_size, population);
@@ -35,7 +35,7 @@ void genetic_algorithm(Node *supplies, Node *requests, Trip *trips, int data_siz
         
         if (iteration == iteration_number-1){
             auto end = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_seconds = end-start;
+            std::chrono::duration<float> elapsed_seconds = end-start;
             cout << "elapsed time: " << elapsed_seconds.count() << endl;
             write_results(data_size, population, number_of_set, supplies, requests, trips);
             cout << data_size << " : " << fitness[0] << endl;
@@ -104,12 +104,12 @@ void create_initial_population(int population_size, int data_size, int ***popula
     // }
 }
 
-double get_max_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
-    double max_profit = 0.0;
+float get_max_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
+    float max_profit = 0.0;
     int best_type = 0;
     for (int i=0; i<3; i++){    
         population[pop_index][2][chrmsm_index] = i;
-        double profit = get_profit(population, supply, req, trip, pop_index, chrmsm_index);
+        float profit = get_profit(population, supply, req, trip, pop_index, chrmsm_index);
         if (profit > max_profit){
             max_profit = profit;
             best_type = i;
@@ -119,27 +119,27 @@ double get_max_profit(int ***population, Node *supply, Node *req, Trip *trip, in
     return max_profit;
 }
 
-double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
-    double profit = 0.0;
-    double speed = 50.0;
+float get_profit(int ***population, Node *supply, Node *req, Trip *trip, int pop_index, int chrmsm_index){
+    float profit = 0.0;
+    float speed = 50.0;
     int delivery_type = population[pop_index][2][chrmsm_index];
     // get the coordinates of the supplier
-    double s_x = supply[chrmsm_index].x;
-    double s_y = supply[chrmsm_index].y;
+    float s_x = supply[chrmsm_index].x;
+    float s_y = supply[chrmsm_index].y;
     // get the coordinates of the request
-    double r_x = req[population[pop_index][0][chrmsm_index]].x;
-    double r_y = req[population[pop_index][0][chrmsm_index]].y;
+    float r_x = req[population[pop_index][0][chrmsm_index]].x;
+    float r_y = req[population[pop_index][0][chrmsm_index]].y;
     // get the coordinates of the trip
-    double ts_x = trip[population[pop_index][1][chrmsm_index]].src.x;
-    double ts_y = trip[population[pop_index][1][chrmsm_index]].src.y;
-    double td_x = trip[population[pop_index][1][chrmsm_index]].dest.x;
-    double td_y = trip[population[pop_index][1][chrmsm_index]].dest.y;
+    float ts_x = trip[population[pop_index][1][chrmsm_index]].src.x;
+    float ts_y = trip[population[pop_index][1][chrmsm_index]].src.y;
+    float td_x = trip[population[pop_index][1][chrmsm_index]].dest.x;
+    float td_y = trip[population[pop_index][1][chrmsm_index]].dest.y;
 
     if (delivery_type == 0){
     // self-sourcing
     // check feasibility
-        double direct_trip_distance = get_distance(s_y, s_x, r_y, r_x);
-        double direct_trip_duration = direct_trip_distance / speed;
+        float direct_trip_distance = get_distance(s_y, s_x, r_y, r_x);
+        float direct_trip_duration = direct_trip_distance / speed;
         if (direct_trip_duration * 60.0 <= 10){
             profit = 10;
         }                
@@ -147,13 +147,13 @@ double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int po
     else if (delivery_type == 1){
         // home del
         // check feasibility
-        double direct_trip_distance = get_distance(ts_y, ts_x, td_y, td_x);
-        double direct_trip_duration = direct_trip_distance / speed;
-        double detour_distance = get_distance(ts_y, ts_x, s_y, s_x)
+        float direct_trip_distance = get_distance(ts_y, ts_x, td_y, td_x);
+        float direct_trip_duration = direct_trip_distance / speed;
+        float detour_distance = get_distance(ts_y, ts_x, s_y, s_x)
                                 + get_distance(s_y, s_x, r_y, r_x)
                                + get_distance(r_y, r_x, td_y, td_x)
                                - direct_trip_distance;
-        double detour_duration = detour_distance / speed;
+        float detour_duration = detour_distance / speed;
         if (detour_duration <= 0.2 * direct_trip_duration){
             profit = 15 - (30 * detour_duration);
         }            
@@ -161,14 +161,14 @@ double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int po
     else if (delivery_type == 2){
         // neighborhood del
         // check feasibility
-        double direct_trip_distance = get_distance(ts_y, ts_x, td_y, td_x);
-        double direct_trip_duration = direct_trip_distance / speed;
-        double detour_distance = get_distance(ts_y, ts_x, s_y, s_x)
+        float direct_trip_distance = get_distance(ts_y, ts_x, td_y, td_x);
+        float direct_trip_duration = direct_trip_distance / speed;
+        float detour_distance = get_distance(ts_y, ts_x, s_y, s_x)
                                 + get_distance(s_y, s_x, td_y, td_x)
                                 - direct_trip_distance;
-        double detour_duration = detour_distance / speed;
-        double demander_distance = get_distance(r_y, r_x, td_y, td_x);
-        double demander_duration = demander_distance / speed;
+        float detour_duration = detour_distance / speed;
+        float demander_distance = get_distance(r_y, r_x, td_y, td_x);
+        float demander_duration = demander_distance / speed;
         if ((detour_duration <= 0.2 * direct_trip_duration) && (demander_duration * 60.0 <= 10.0)){
             profit = 15 - (30 * detour_duration);
         }
@@ -177,9 +177,9 @@ double get_profit(int ***population, Node *supply, Node *req, Trip *trip, int po
 }
 
 
-void calculate_fitness(double *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip){
+void calculate_fitness(float *fitness, int ***population, int population_size, int data_size, Node *supply, Node *req, Trip *trip){
     for (int i=0; i<population_size; i++){
-        double sum = 0;
+        float sum = 0;
         for (int j=0; j<data_size; j++){
             sum += get_profit(population, supply, req, trip, i, j);
         }
@@ -187,7 +187,7 @@ void calculate_fitness(double *fitness, int ***population, int population_size, 
     }
 }
 
-void rank_select(double *fitness, int population_size, int ***population, int *selection_pool){
+void rank_select(float *fitness, int population_size, int ***population, int *selection_pool){
     int temp;
     int **temp_p;
     // sort the fitness array
@@ -213,10 +213,10 @@ void rank_select(double *fitness, int population_size, int ***population, int *s
     }
 }
 
-void roulette_wheel_select(double *fitness, int population_size, int ***population, int *selection_pool){
+void roulette_wheel_select(float *fitness, int population_size, int ***population, int *selection_pool){
     float *abs_probility = (float *)malloc(population_size * sizeof(float));
     float *cum_probility = (float *)malloc(population_size * sizeof(float));
-    double sum_of_fitness = 0;
+    float sum_of_fitness = 0;
     float sum_of_prob = 0;
     for (int i=0; i<population_size; i++){
         sum_of_fitness += fitness[i];
@@ -366,39 +366,40 @@ void mutation(int population_size, int data_size, int ***population, Node *suppl
             }
         }
         // swap two items in one chromo
-        int random1 = rand() % data_size;
-        int random2 = rand() % data_size;
-        while (random2 == random1) random2 = rand() % data_size;
-        int element = (rand() % 2);
+        for (int t=0; t<30; t++){
+            int random1 = rand() % data_size;
+            int random2 = rand() % data_size;
+            while (random2 == random1) random2 = rand() % data_size;
+            int element = (rand() % 2);
 
-        double current_profit = get_max_profit(population, supply, req, trip, i, random1) + get_max_profit(population, supply, req, trip, i, random2);
-        int temp1 = population[i][element][random1];
-        int temp2 = population[i][element][random2];
-        population[i][element][random1] = temp2;
-        population[i][element][random2] = temp1;
-        double new_profit = get_max_profit(population, supply, req, trip, i, random1) + get_max_profit(population, supply, req, trip, i, random2);
-        if ( new_profit < current_profit){
-            population[i][element][random1] = temp1;
-            population[i][element][random2] = temp2;
+            float current_profit = get_max_profit(population, supply, req, trip, i, random1) + get_max_profit(population, supply, req, trip, i, random2);
+            int temp1 = population[i][element][random1];
+            int temp2 = population[i][element][random2];
+            population[i][element][random1] = temp2;
+            population[i][element][random2] = temp1;
+            float new_profit = get_max_profit(population, supply, req, trip, i, random1) + get_max_profit(population, supply, req, trip, i, random2);
+            if ( new_profit < current_profit){
+                population[i][element][random1] = temp1;
+                population[i][element][random2] = temp2;
+            }
         }
-
     }
     free(seen);
 }
 
-double get_distance(double longitude, double latitude, double otherLongitude, double otherLatitude){
-    double pi = 3.14159;
-    double d1 = latitude * (pi / 180.0);
-    double num1 = longitude * (pi / 180.0);
-    double d2 = otherLatitude * (pi / 180.0);
-    double num2 = otherLongitude * (pi / 180.0) - num1;
-    double d3 = pow(sin((d2 - d1) / 2.0), 2.0) + cos(d1) * cos(d2) * pow(sin(num2 / 2.0), 2.0);
+float get_distance(float longitude, float latitude, float otherLongitude, float otherLatitude){
+    float pi = 3.14159;
+    float d1 = latitude * (pi / 180.0);
+    float num1 = longitude * (pi / 180.0);
+    float d2 = otherLatitude * (pi / 180.0);
+    float num2 = otherLongitude * (pi / 180.0) - num1;
+    float d3 = pow(sin((d2 - d1) / 2.0), 2.0) + cos(d1) * cos(d2) * pow(sin(num2 / 2.0), 2.0);
 
-    double res = 6376500.0 * (2.0 * atan2(sqrt(d3), sqrt(1.0 - d3)));
+    float res = 6376500.0 * (2.0 * atan2(sqrt(d3), sqrt(1.0 - d3)));
     return (res * 1.2) / 1000 ;
 }
 
-void write_temp(double fit_value, int set_number, int data_size){
+void write_temp(float fit_value, int set_number, int data_size){
     string dir = "D:\\Project_Data\\Generated_Coordinates\\Sample" + to_string(set_number) + "\\NewResult" + to_string(data_size) + "\\iteration.csv";
     std::ofstream myfile( dir, std::ios::app ) ;
     myfile << fit_value << endl;
@@ -414,7 +415,7 @@ void write_results(int data_size, int ***population, int number_of_set, Node *su
         MyText += "\nreq id: " + std::to_string(population[0][0][i]);
         MyText += "\ntrip id: " + std::to_string(population[0][1][i]);
         MyText += "\ndel type: " + std::to_string(population[0][2][i]);
-        double profit = get_profit(population, supply, req, trip, 0, i);
+        float profit = get_profit(population, supply, req, trip, 0, i);
         MyText += "\nprofit: " + std::to_string(profit);
         MyText += "\n------\n";
     }
@@ -439,7 +440,7 @@ void print_population(int top, int intop, int ***population){
     }
 }
 
-void print_fitness(double *fitness, int population_size){
+void print_fitness(float *fitness, int population_size){
     for (int i=0; i<population_size; i++){
         cout << fitness[i] << " , ";
     }

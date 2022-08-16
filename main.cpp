@@ -32,8 +32,8 @@ void read_data_node(int index, int ctrl, int data_size, Node *ptr){
             ssin >> arr[i];
             ++i;
         }
-        double x = stof(arr[0]);
-        double y = stof(arr[1]);
+        float x = stof(arr[0]);
+        float y = stof(arr[1]);
         Node node;
         node.x = x;
         node.y = y;
@@ -60,10 +60,10 @@ void read_data_trip(int index, int data_size, Trip *ptr){
             ssin >> arr[i];
             ++i;
         }
-        double x1 = stof(arr[0]);
-        double y1 = stof(arr[1]);
-        double x2 = stof(arr[2]);
-        double y2 = stof(arr[3]);
+        float x1 = stof(arr[0]);
+        float y1 = stof(arr[1]);
+        float x2 = stof(arr[2]);
+        float y2 = stof(arr[3]);
         Trip trip;
         Node node1;
         Node node2;
@@ -79,23 +79,23 @@ void read_data_trip(int index, int data_size, Trip *ptr){
     MyReadFile.close();
 }
 
-double average_travel_time(Trip *trips, int size){
-    double sum = 0.0;
-    double speed = 50.0;
+float average_travel_time(Trip *trips, int size){
+    float sum = 0.0;
+    float speed = 50.0;
     for (int i=0; i<size; i++){
-        double time = get_distance(trips[i].src.y, trips[i].src.x, trips[i].dest.y, trips[i].dest.x) / speed * 60.0;
+        float time = get_distance(trips[i].src.y, trips[i].src.x, trips[i].dest.y, trips[i].dest.x) / speed * 60.0;
         sum += time;
-        if (time < 100.0) cout << i+1 << " : " << time << endl;
+        // if (time < 10.0 ) cout << i+1 << " : " << time << endl;
     }
-    double average = (double)sum/size;
+    float average = (float)sum/size;
     cout << "average : " << average << endl;
 
     sum = 0.0;
     for (int i=0; i<size; i++){
-        double time = get_distance(trips[i].src.y, trips[i].src.x, trips[i].dest.y, trips[i].dest.x) / speed * 60.0;
+        float time = get_distance(trips[i].src.y, trips[i].src.x, trips[i].dest.y, trips[i].dest.x) / speed * 60.0;
         sum += pow(time - average, 2);
     }
-    double std = sqrt((double)sum/size);
+    float std = sqrt((float)sum/size);
     cout << "std : " << std << endl;
     return average;
 }
@@ -105,10 +105,10 @@ int main(){
     std::cout << "begin" << std::endl;
     srand(time(0));
     // int num_of_sets = 1;
-    // int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
+    int parts[] = { 10, 25, 50, 75, 100, 150, 200 };
 
     int num_of_sets = 1;
-    int parts[] = {100};
+    // int parts[] = {200};
 
     for (int i=0; i<num_of_sets; i++){
         for (int part : parts){
@@ -123,7 +123,7 @@ int main(){
             // read crowdshippers
             read_data_trip(i+1, part, trips);
 
-            average_travel_time(trips, part);
+            // average_travel_time(trips, part);
             genetic_algorithm(supplies, requests, trips, part, i+1);
             // free the memory allocated
             free(supplies);
@@ -131,43 +131,6 @@ int main(){
             free(trips);
         }
     }
-
-    // testing functions
-
-    // int pop_size = 4;
-    // int data_size = 4;
-    // int ***population = (int ***)malloc(pop_size * sizeof(int **));
-    // int *fitness = (int *)malloc(pop_size * sizeof(int));
-    // int *selection_pool = (int *)malloc(pop_size * sizeof(int));
-
-    // for (int i=0; i<pop_size; i++){
-    //     int **temp = (int **)malloc(3 * sizeof(int *));
-    //     for (int j=0; j<3; j++){
-    //         int *temp2 = (int *)malloc(data_size * sizeof(int));
-    //         temp[j] = temp2;
-    //     }
-    //     population[i] = temp;
-    // }
-
-    // for (int i=0; i<pop_size; i++){
-    //     for (int j=0; j<3; j++){
-    //         for (int k=0; k<data_size; k++){
-    //             population[i][j][k] = i;
-    //         }
-    //     }
-    // }
-
-    // for (int i=0; i<pop_size; i++){
-    //     fitness[i] = i;
-    // }
-
-    // print_population(4, 4, population);
-    // print_fitness(fitness, pop_size);
-    // rank_select(fitness, pop_size, population, selection_pool);
-
-    // print_population(4, 4, population);
-    // print_fitness(fitness, pop_size);
-    // print_fitness(selection_pool, pop_size);
 
     cout << "end" << endl;
     return 0;
